@@ -2,16 +2,14 @@
 
 <div class="row justify-content-center">
     <div class="col-lg-10">
-        <!-- Back Link -->
         <a href="index.php?url=challenges" class="btn btn-link text-primary p-0 mb-4 text-decoration-none fw-bold">
             <i class="bi bi-arrow-left me-2"></i> Retour à la liste des défis
         </a>
 
-        <!-- Main Challenge Card -->
         <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-5">
             <div class="position-relative" style="height: 400px; background-color: #000;">
                 <?php if ($challenge->getImagePath()): ?>
-                    <img src="<?= htmlspecialchars($challenge->getImagePath()) ?>" class="w-100 h-100 object-cover opacity-75" style="object-fit: cover;">
+                    <img src="<?= ltrim(htmlspecialchars($challenge->getImagePath()), '/') ?>" class="w-100 h-100 object-cover opacity-75" style="object-fit: cover;">
                 <?php else: ?>
                     <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-dark">
                         <i class="bi bi-image text-secondary opacity-25" style="font-size: 5rem;"></i>
@@ -69,7 +67,7 @@
                         $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
                         if (isset($_SESSION['user_id']) && ($_SESSION['user_id'] === $challenge->getUserId() || $isAdmin)): ?>
                             <div class="d-grid gap-2">
-                                <?php if ($_SESSION['user_id'] === $challenge->getUserId()): ?>
+                                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] === $challenge->getUserId()): ?>
                                     <a href="index.php?url=challenge/edit&id=<?= $challenge->getId() ?>" class="btn btn-outline-dark rounded-3">
                                         <i class="bi bi-pencil-square me-2"></i> Modifier ce défi
                                     </a>
@@ -86,7 +84,6 @@
             </div>
         </div>
 
-        <!-- Section Participations -->
         <div class="card border-0 bg-light rounded-4 p-4 p-md-5">
             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-5 gap-3">
                 <h2 class="h2 fw-black text-dark mb-0">Participations</h2>
@@ -104,8 +101,8 @@
                             <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="flex-shrink-0 bg-light rounded-3 overflow-hidden" style="width: 80px; height: 80px;">
-                                        <?php if($sub['image']): ?>
-                                            <img src="<?= htmlspecialchars($sub['image']) ?>" class="w-100 h-100 object-cover">
+                                        <?php if(!empty($sub['image'])): ?>
+                                            <img src="uploads/<?= htmlspecialchars($sub['image']) ?>" class="w-100 h-100 object-cover">
                                         <?php else: ?>
                                             <div class="w-100 h-100 d-flex align-items-center justify-content-center opacity-25">
                                                 <i class="bi bi-image fs-1"></i>
