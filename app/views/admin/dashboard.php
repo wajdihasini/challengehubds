@@ -5,7 +5,7 @@
 </div>
 
 <div class="row g-4 mb-5">
-    <!-- Utilisateurs Stats Card -->
+
     <div class="col-md-4">
         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden hover-shadow transition-all">
             <div class="card-body p-4">
@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <!-- Défis Stats Card -->
+
     <div class="col-md-4">
         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden hover-shadow transition-all">
             <div class="card-body p-4">
