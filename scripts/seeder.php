@@ -2,11 +2,11 @@
 require_once __DIR__ . '/../app/core/Autoload.php';
 
 echo "--- ChallengeHub Seeder ---\n";
-
+// Ce script va  insérer des données aleatoirement pour test pour les utilisateurs, défis, participations, commentaires et votes. 
 try {
     $db = Database::getInstance()->getConnection();
 
-    // 1. Clear existing data (optional, but good for a fresh seed)
+
     echo "Nettoyage de la base de données...\n";
     $db->exec("SET FOREIGN_KEY_CHECKS = 0;");
     $db->exec("TRUNCATE TABLE votes;");
@@ -16,7 +16,7 @@ try {
     $db->exec("TRUNCATE TABLE users;");
     $db->exec("SET FOREIGN_KEY_CHECKS = 1;");
 
-    // 2. Seed Users
+
     echo "Création des utilisateurs...\n";
     $users = [
         ['Jean', 'Dupont', 'jean@example.com', 'M', '1990-05-15', 'Paris', password_hash('password123', PASSWORD_DEFAULT)],
@@ -32,7 +32,7 @@ try {
     $userCount = count($users);
     echo "$userCount utilisateurs créés.\n";
 
-    // 3. Seed Challenges
+ 
     echo "Création des défis...\n";
     $challenges = [
         [1, 'Défi Photo : Nature Urbaine', 'Capturez la nature au cœur de la ville.', 'Photo', '2026-04-30', null],
@@ -47,7 +47,7 @@ try {
     }
     echo "4 défis créés.\n";
 
-    // 4. Seed Submissions
+ 
     echo "Création des participations...\n";
     $submissions = [
         [1, 2, 'Un arbre qui pousse à travers le béton.', null],
@@ -64,7 +64,7 @@ try {
     }
     echo "6 participations créées.\n";
 
-    // 5. Seed Comments
+
     echo "Création des commentaires...\n";
     $comments = [
         [1, 1, 'Superbe composition !'],
@@ -79,7 +79,7 @@ try {
     }
     echo "4 commentaires créés.\n";
 
-    // 6. Seed Votes
+
     echo "Création des votes...\n";
     $votes = [
         [1, 1], [1, 2], [1, 3], // 3 votes pour sub 1
