@@ -29,7 +29,10 @@ class ChallengeApiController extends ApiController {
         $this->jsonSuccess('Challenges retrieved successfully', $data);
     }
 
-
+    /**
+     * GET /api/challenge?id=X
+     * Returns details of a specific challenge.
+     */
     public function view() {
         $id = (int)($_GET['id'] ?? 0);
         
