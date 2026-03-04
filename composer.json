@@ -1,0 +1,17 @@
+{
+    "name": "wajdi/challengehubds",
+    "autoload": {
+        "psr-4": {
+            "Wajdi\\Challengehubds\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Wajdihasini",
+            "email": "wajdihasini@gamil.com"
+        }
+    ],
+    "require": {
+        "twbs/bootstrap": "^5.3"
+    }
+}
