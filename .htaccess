@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /challengehub/
+
+    # Important: serve existing files & directories directly (images, css, js, uploads...)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # All other requests go to index.php
+    RewriteRule ^(.*)$ index.php [L]
+</IfModule>
