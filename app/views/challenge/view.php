@@ -101,8 +101,11 @@
                             <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="flex-shrink-0 bg-light rounded-3 overflow-hidden" style="width: 80px; height: 80px;">
-                                        <?php if(!empty($sub['image'])): ?>
-                                            <img src="uploads/<?= htmlspecialchars($sub['image']) ?>" class="w-100 h-100 object-cover">
+                                        <?php 
+                                        // Modification corrective pour les images des participations
+                                        $photoPath = $sub['image'] ?? $sub['image_path'] ?? null;
+                                        if($photoPath): ?>
+                                            <img src="<?= ltrim(htmlspecialchars($photoPath), '/') ?>" class="w-100 h-100 object-cover">
                                         <?php else: ?>
                                             <div class="w-100 h-100 d-flex align-items-center justify-content-center opacity-25">
                                                 <i class="bi bi-image fs-1"></i>
