@@ -14,7 +14,6 @@
     </div>
 </div>
 
-<!-- Filtres et Recherche -->
 <div class="card border-0 shadow-sm mb-5">
     <div class="card-body p-4">
         <form method="GET" action="index.php" class="row g-3">
@@ -53,7 +52,6 @@
     </div>
 </div>
 
-<!-- Messages Flash -->
 <?php
 $msg = $_GET['msg'] ?? '';
 if ($msg): ?>
@@ -72,7 +70,6 @@ if ($msg): ?>
     </div>
 <?php endif; ?>
 
-<!-- Liste des Défis -->
 <?php if (empty($challenges)): ?>
     <div class="text-center py-5 bg-white rounded-4 border border-2 border-dashed border-light-subtle">
         <div class="display-1 text-muted mb-3"><i class="bi bi-folder-x"></i></div>
@@ -84,9 +81,9 @@ if ($msg): ?>
         <?php foreach ($challenges as $challenge): ?>
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 shadow-sm hover-shadow transition-all border-0 rounded-4 overflow-hidden">
-                    <div class="position-relative h-200">
+                    <div class="position-relative" style="height: 200px;">
                         <?php if ($challenge->getImagePath()): ?>
-                            <img src="<?= htmlspecialchars($challenge->getImagePath()) ?>" class="card-img-top w-100 h-100 object-cover" style="height: 200px; object-fit: cover;">
+                            <img src="<?= ltrim(htmlspecialchars($challenge->getImagePath()), '/') ?>" class="card-img-top w-100 h-100 object-cover" style="height: 200px; object-fit: cover;">
                         <?php else: ?>
                             <div class="bg-secondary-subtle d-flex align-items-center justify-content-center" style="height: 200px;">
                                 <i class="bi bi-image text-secondary opacity-25" style="font-size: 4rem;"></i>
@@ -121,6 +118,3 @@ if ($msg): ?>
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
-</div>
-
-<?php include __DIR__ . '/../layout/footer.php'; ?>
