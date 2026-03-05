@@ -2,14 +2,12 @@
 
 <div class="row justify-content-center">
     <div class="col-lg-10">
-        <!-- Header/Back Nav -->
         <div class="mb-4">
-            <a href="index.php?url=submissions" class="btn btn-link link-primary p-0 text-decoration-none fw-bold small">
-                <i class="bi bi-arrow-left me-1"></i> Toutes les participations
+            <a href="index.php?url=challenges" class="btn btn-link link-primary p-0 text-decoration-none fw-bold small">
+                <i class="bi bi-arrow-left me-1"></i> Retour au défi
             </a>
         </div>
 
-        <!-- Flash Messages -->
         <?php if (isset($_GET['msg'])): ?>
             <div class="alert alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4 <?php 
                 echo (strpos($_GET['msg'], 'error') !== false || $_GET['msg'] === 'self_vote' || $_GET['msg'] === 'auth_error') 
@@ -38,20 +36,18 @@
 
         <?php if ($submission) : ?>
             <div class="row g-5">
-                <!-- Image Section -->
                 <div class="col-md-6">
                     <div class="card border-0 shadow-lg rounded-5 overflow-hidden sticky-top" style="top: 100px; transform: rotate(-1deg);">
                         <?php if(!empty($submission->getImage())) : ?>
-                            <img src="<?= htmlspecialchars($submission->getImage()); ?>" class="img-fluid w-100" alt="Participation Image">
+                            <img src="<?= ltrim(htmlspecialchars($submission->getImage()), '/'); ?>" class="img-fluid w-100" alt="Participation Image">
                         <?php else: ?>
                             <div class="bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
-                                <img src="/uploads/no-image.png" class="img-fluid opacity-25" style="max-height: 200px;">
+                                <i class="bi bi-image text-muted opacity-25" style="font-size: 5rem;"></i>
                             </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <!-- Content Section -->
                 <div class="col-md-6">
                     <div class="ps-md-4">
                         <span class="badge bg-primary-subtle text-primary text-uppercase fw-black tracking-widest mb-3" style="font-size: 0.7rem; letter-spacing: 0.1em;">
@@ -59,7 +55,6 @@
                         </span>
                         <h1 class="display-6 fw-black text-dark mb-4">L'œuvre et son contexte</h1>
                         
-                        <!-- Vote Count Display -->
                         <div class="d-flex align-items-center gap-2 mb-5">
                             <div class="btn btn-primary rounded-4 fw-black py-2 px-4 shadow-sm border-0 d-flex align-items-center">
                                 <i class="bi bi-hand-thumbs-up-fill me-2"></i>
@@ -120,7 +115,6 @@
                                 </div>
                             <?php endif; ?>
 
-                            <!-- Form Add Comment -->
                             <div class="mt-4">
                                 <form action="index.php?url=submission/comment" method="POST">
                                     <input type="hidden" name="submission_id" value="<?= $submission->getIdSub(); ?>">
@@ -143,7 +137,7 @@
             <div class="text-center py-5">
                 <i class="bi bi-search display-3 text-muted mb-4 d-block"></i>
                 <h3 class="fw-bold text-muted fst-italic">Oups, cette participation a disparu...</h3>
-                <a href="index.php?url=submissions" class="btn btn-primary rounded-pill px-4 mt-3">Retour aux participations</a>
+                <a href="index.php?url=challenges" class="btn btn-primary rounded-pill px-4 mt-3">Retour aux défis</a>
             </div>
         <?php endif; ?>
     </div>
