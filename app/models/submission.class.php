@@ -1,192 +1,137 @@
 <?php
 
-class ChallengeController {
+class Submission {
+    private ?int $id_sub = null;
+    private int $id_ch;
+    private int $id_user;
+    private string $description;
+    private ?string $image;
+    private string $submitted_at;
 
-    public function index() {
-        $search = $_GET['search'] ?? null;
-        $category = $_GET['category'] ?? null;
-        $sort = $_GET['sort'] ?? 'newest';
-        $challenges = Challenge::findAll($search, $category, $sort);
-        require __DIR__ . '/../views/challenges/list.php';
+    private $conn;
+    private $table = "submissions";
+
+    public function __construct() {
+        $this->conn = Database::getInstance()->getConnection();
     }
 
-    public function create() {
-        $errors = [];
+    // Getters
+    public function getIdSub(): ?int      { return $this->id_sub; }
+    public function getIdCh(): int        { return $this->id_ch; }
+    public function getIdUser(): int       { return $this->id_user; }
+    public function getDescription(): string { return $this->description; }
+    public function getImage(): ?string    { return $this->image; }
+    public function getSubmittedAt(): string  { return $this->submitted_at; }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (!isset($_SESSION['user_id'])) {
-                header('Location: /challengehub/login'); // adjust if needed
-                exit;
-            }
+    // Setters
+    public function setIdCh(int $val): void          { $this->id_ch = $val; }
+    public function setIdUser(int $val): void        { $this->id_user = $val; }
+    public function setDescription(string $val): void { $this->description = $val; }
+    public function setImage(?string $val): void      { $this->image = $val; }
 
-            $data = [
-                'titre'       => trim($_POST['titre'] ?? ''),
-                'description' => trim($_POST['description'] ?? ''),
-                'categorie'   => trim($_POST['categorie'] ?? ''),
-                'date_limite' => trim($_POST['date_limite'] ?? ''),
-            ];
+    // 🔹 Ajouter une submission
+    public function create($id_ch, $id_user, $description, $image) {
+        $query = "INSERT INTO " . $this->table . " 
+                  (id_ch, id_user, description, image) 
+                  VALUES (:id_ch, :id_user, :description, :image)";
 
-            $errors = $this->validate($data);
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_ch', $id_ch);
+        $stmt->bindParam(':id_user', $id_user);
+        $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':image', $image);
 
-            $image_path = null;
-            $uploadResult = null;
-            if (!empty($_FILES['image']['name']) && empty($errors)) {
-                $uploadResult = $this->uploadImage();
-                // Check if it's a path (starts with /uploads) or an error message
-                if (strpos($uploadResult, '/uploads/') === 0) {
-                    $image_path = $uploadResult;
-                } else {
-                    $errors[] = $uploadResult;
-                }
-            }
-
-            if (empty($errors)) {
-                $data['image_path'] = $image_path;
-                $success = Challenge::create($data, (int)$_SESSION['user_id']);
-                if ($success) {
-                    header('Location: index.php?url=challenges&msg=create_success');
-                    exit;
-                }
-                $errors[] = "Erreur lors de l'enregistrement.";
-            }
-        }
-
-        require __DIR__ . '/../views/challenges/create.php';
+        return $stmt->execute();
     }
 
-    public function edit(int $id) {
-        $challenge = Challenge::findById($id);
-        if (!$challenge) {
-            http_response_code(404);
-            echo "<h1>404 - Défi non trouvé</h1>";
-            echo "<p><a href=\"/challengehub/challenges\">Retour à la liste</a></p>";
-            exit;
-        }
+    // 🔹 Récupérer toutes les submissions avec les infos liées (pour l'admin)
+    public function getAll() {
+        $query = "SELECT s.*, u.email as user_email 
+                  FROM " . $this->table . " s
+                  JOIN users u ON s.id_user = u.id
+                  ORDER BY s.id_sub DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
 
-        if ($challenge->getUserId() !== (int)($_SESSION['user_id'] ?? 0)) {
-            http_response_code(403);
-            echo "<h1>403 - Accès non autorisé</h1>";
-            echo "<p><a href=\"/challengehub/challenges\">Retour à la liste</a></p>";
-            exit;
-        }
-
-        $errors = [];
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $data = [
-                'titre'       => trim($_POST['titre'] ?? $challenge->getTitre()),
-                'description' => trim($_POST['description'] ?? $challenge->getDescription()),
-                'categorie'   => trim($_POST['categorie'] ?? $challenge->getCategorie()),
-                'date_limite' => trim($_POST['date_limite'] ?? $challenge->getDateLimite()),
-            ];
-
-            $errors = $this->validate($data);
-
-            $image_path = $challenge->getImagePath();
-            $uploadResult = null;
-            if (!empty($_FILES['image']['name'])) {
-                $uploadResult = $this->uploadImage();
-                if (strpos($uploadResult, '/uploads/') === 0) {
-                    $image_path = $uploadResult;
-                } else {
-                    $errors[] = $uploadResult;
-                }
-            }
-
-            if (empty($errors)) {
-                $data['image_path'] = $image_path;
-                $success = Challenge::update($id, $data, (int)$_SESSION['user_id']);
-                if ($success) {
-                    header('Location: index.php?url=challenges&msg=edit_success');
-                    exit;
-                }
-                $errors[] = "Erreur lors de la modification.";
-            }
-        }
-
-        require __DIR__ . '/../views/challenges/edit.php';
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function delete(int $id) {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo "<h1>405 - Méthode non autorisée</h1>";
-            exit;
-        }
+    // 🔹 Récupérer une submission par ID
+    public function getById($id_sub) {
+        $query = "SELECT * FROM " . $this->table . " WHERE id_sub = :id_sub";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_sub', $id_sub);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $challenge = Challenge::findById($id);
-        $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
-        if (!$challenge || ($challenge->getUserId() !== (int)($_SESSION['user_id'] ?? 0) && !$isAdmin)) {
-            http_response_code(403);
-            echo "<h1>403 - Accès non autorisé</h1>";
-            exit;
-        }
+        if (!$row) return null;
 
-        Challenge::delete($id, (int)$_SESSION['user_id']);
-        header('Location: index.php?url=challenges&msg=delete_success');
-        exit;
+        $s = new self();
+        $s->id_sub      = (int)$row['id_sub'];
+        $s->id_ch       = (int)$row['id_ch'];
+        $s->id_user     = (int)$row['id_user'];
+        $s->description = $row['description'];
+        $s->image        = $row['image'];
+        $s->submitted_at = $row['submitted_at'];
+
+        return $s;
     }
 
-    public function view(int $id) {
-        $challenge = Challenge::findById($id);
-        if (!$challenge) {
-            http_response_code(404);
-            echo "<h1>404 - Défi non trouvé</h1>";
-            echo "<p><a href=\"/challengehub/challenges\">Retour à la liste</a></p>";
-            exit;
-        }
+    // 🔹 Récupérer les participations d'un défi avec le nombre de votes
+    public function getByChallenge($id_ch) {
+        $query = "SELECT s.*, COUNT(v.id_vote) as vote_count, u.nom as user_nom, u.prenom as user_prenom
+                  FROM " . $this->table . " s
+                  LEFT JOIN votes v ON s.id_sub = v.submission_id
+                  LEFT JOIN users u ON s.id_user = u.id
+                  WHERE s.id_ch = :id_ch
+                  GROUP BY s.id_sub
+                  ORDER BY vote_count DESC";
 
-        // Récupérer les participations
-        $submissionModel = new Submission();
-        $submissions = $submissionModel->getByChallenge($id);
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_ch', $id_ch);
+        $stmt->execute();
 
-        require __DIR__ . '/../views/challenges/view.php';
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    private function validate(array $data): array {
-        $errors = [];
+    // 🔹 Mettre à jour une submission
+    public function update($id_sub, $description, $image) {
+        $query = "UPDATE " . $this->table . " 
+                  SET description = :description, image = :image 
+                  WHERE id_sub = :id_sub";
 
-        if (empty($data['titre']) || strlen($data['titre']) < 3) {
-            $errors[] = "Le titre doit contenir au moins 3 caractères.";
-        }
-        if (empty($data['description']) || strlen($data['description']) < 10) {
-            $errors[] = "La description doit contenir au moins 10 caractères.";
-        }
-        if (empty($data['categorie'])) {
-            $errors[] = "La catégorie est obligatoire.";
-        }
-        if (empty($data['date_limite']) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $data['date_limite'])) {
-            $errors[] = "Date limite invalide (format AAAA-MM-JJ).";
-        }
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':image', $image);
+        $stmt->bindParam(':id_sub', $id_sub);
 
-        return $errors;
+        return $stmt->execute();
     }
 
-    private function uploadImage(): string {
-        $targetDir = __DIR__ . "/../../public/uploads/challenges/";
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0775, true);
-        }
+    // 🔹 Supprimer une submission
+    public function delete($id_sub) {
+        $query = "DELETE FROM " . $this->table . " WHERE id_sub = :id_sub";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_sub', $id_sub);
 
-        $fileName = uniqid() . '-' . basename($_FILES["image"]["name"]);
-        $targetFile = $targetDir . $fileName;
-        $relativePath = "/uploads/challenges/" . $fileName;
+        return $stmt->execute();
+    }
 
-        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
-        $ext = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
+    // 🔹 Récupérer le classement des meilleures participations
+    public function getRanking($limit = 10) {
+        $query = "SELECT s.*, COUNT(v.id_vote) as vote_count, u.nom as user_nom, u.prenom as user_prenom, c.titre as challenge_titre
+                  FROM " . $this->table . " s
+                  LEFT JOIN votes v ON s.id_sub = v.submission_id
+                  LEFT JOIN users u ON s.id_user = u.id
+                  LEFT JOIN challenges c ON s.id_ch = c.id
+                  GROUP BY s.id_sub
+                  ORDER BY vote_count DESC
+                  LIMIT :limit";
 
-        if (!in_array($ext, $allowed)) {
-            return "Format non autorisé (jpg, jpeg, png, gif seulement).";
-        }
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->execute();
 
-        if ($_FILES["image"]["size"] > 5000000) {
-            return "Fichier trop volumineux (max 5 Mo).";
-        }
-
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile)) {
-            return $relativePath;
-        }
-
-        return "Échec du téléversement de l'image.";
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
