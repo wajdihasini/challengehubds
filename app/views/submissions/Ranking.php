@@ -35,8 +35,13 @@
                                 <td>
                                     <div class="d-flex align-items-center gap-3 py-2">
                                         <div class="flex-shrink-0" style="width: 70px; height: 70px;">
-                                            <?php if ($sub['image']): ?>
-                                                <img src="<?= htmlspecialchars($sub['image']) ?>" class="rounded-3 w-100 h-100 object-fit-cover shadow-sm">
+                                            <?php 
+                                            // Récupération du chemin de l'image et nettoyage du slash initial
+                                            $photoPath = $sub['image'] ?? $sub['image_path'] ?? '';
+                                            if (!empty($photoPath)): ?>
+                                                <img src="<?= ltrim(htmlspecialchars($photoPath), '/') ?>" 
+                                                     class="rounded-3 w-100 h-100 object-fit-cover shadow-sm" 
+                                                     style="object-fit: cover;">
                                             <?php else: ?>
                                                 <div class="rounded-3 w-100 h-100 bg-light d-flex align-items-center justify-content-center border border-dashed text-muted">
                                                     <i class="bi bi-image" style="font-size: 1.5rem;"></i>
@@ -48,20 +53,20 @@
                                                 <?= htmlspecialchars($sub['description']) ?>
                                             </h6>
                                             <p class="mb-0 text-muted small">
-                                                Par <span class="fw-semibold"><?= htmlspecialchars($sub['user_prenom'] . ' ' . $sub['user_nom']) ?></span> 
-                                                dans <span class="fst-italic text-primary-emphasis"><?= htmlspecialchars($sub['challenge_titre']) ?></span>
+                                                Par <span class="fw-semibold"><?= htmlspecialchars(($sub['user_prenom'] ?? $sub['prenom'] ?? 'Utilisateur') . ' ' . ($sub['user_nom'] ?? $sub['nom'] ?? '')) ?></span> 
+                                                dans <span class="fst-italic text-primary-emphasis"><?= htmlspecialchars($sub['challenge_titre'] ?? $sub['challenge_title'] ?? $sub['titre'] ?? 'Défi') ?></span>
                                             </p>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-inline-flex flex-column align-items-center">
-                                        <span class="fs-3 fw-black text-primary line-height-1"><?= $sub['vote_count'] ?></span>
+                                        <span class="fs-3 fw-black text-primary line-height-1"><?= $sub['vote_count'] ?? 0 ?></span>
                                         <span class="text-uppercase fw-black text-muted mt-minus-1" style="font-size: 0.6rem; letter-spacing: 0.1em;">Points</span>
                                     </div>
                                 </td>
                                 <td class="pe-4 text-end">
-                                    <a href="index.php?url=submission/view&id=<?= $sub['id_sub'] ?>" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold text-uppercase" style="font-size: 0.65rem;">
+                                    <a href="index.php?url=submission/view&id=<?= $sub['id_sub'] ?? $sub['id'] ?>" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold text-uppercase" style="font-size: 0.65rem;">
                                         Voir l'œuvre
                                     </a>
                                 </td>
