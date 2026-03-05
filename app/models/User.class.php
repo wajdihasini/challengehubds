@@ -14,7 +14,7 @@ class User extends Model {
 
     private $table = "users";
 
-    // Getters
+    
     public function getId(): ?int             { return $this->id; }
     public function getNom(): string          { return $this->nom; }
     public function getPrenom(): string       { return $this->prenom; }
@@ -26,7 +26,7 @@ class User extends Model {
     public function getRole(): string         { return $this->role; }
     public function getCreatedAt(): string    { return $this->created_at; }
 
-    // Setters
+    
     public function setNom(string $val): void           { $this->nom = $val; }
     public function setPrenom(string $val): void        { $this->prenom = $val; }
     public function setEmail(string $val): void         { $this->email = $val; }
