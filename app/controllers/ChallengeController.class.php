@@ -7,7 +7,7 @@ class ChallengeController {
         $category = $_GET['category'] ?? null;
         $sort = $_GET['sort'] ?? 'newest';
         $challenges = Challenge::findAll($search, $category, $sort);
-        require __DIR__ . '/../views/challenges/list.php';
+        require __DIR__ . '/../views/challenge/list.php';
     }
 
     public function create() {
